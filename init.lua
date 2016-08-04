@@ -130,6 +130,7 @@ function prnn.getSharedWorkspace()
     return sharedBuffer[device][stream]
 end
 
+--[[
 require('prnn.RNN')
 require('prnn.RNNTanh')
 require('prnn.RNNReLU')
@@ -137,6 +138,7 @@ require('prnn.BLSTM')
 require('prnn.LSTM')
 require('prnn.BGRU')
 require('prnn.GRU')
+--]]
 
 
 return prnn
