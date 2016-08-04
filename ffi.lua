@@ -93,6 +93,7 @@ prnnStatus_t             prnnDestroyTensorDescriptor(
 
 typedef struct prnnDropoutStruct * prnnDropoutDescriptor_t;
 
+
 /* RNN API */
 typedef enum
   {
@@ -135,7 +136,9 @@ prnnStatus_t             prnnSetRNNDescriptor(prnnRNNDescriptor_t rnnDesc,
                                                 prnnRNNInputMode_t inputMode,
                                                 prnnDirectionMode_t direction,
                                                 prnnRNNMode_t mode,
-                                                prnnDataType_t dataType);
+                                                prnnDataType_t dataType,
+                                                prnnBackend_t backend
+                                                );
 
 
 // dataType in the RNN descriptor is used to determine math precision
@@ -158,9 +161,8 @@ prnnStatus_t             prnnGetRNNTrainingReserveSize( prnnHandle_t            
 
 prnnStatus_t             prnnGetRNNParamsSize( prnnHandle_t              handle,
                                                  const prnnRNNDescriptor_t rnnDesc,
-                                                 const prnnTensorDescriptor_t    xDesc,
-                                                 size_t                     *sizeInBytes,
-                                                 prnnDataType_t dataType
+                                                 const prnnTensorDescriptor_t    *xDesc,
+                                                 size_t                     *sizeInBytes
                                                     );
 
 prnnStatus_t             prnnGetRNNLinLayerMatrixParams( prnnHandle_t              handle,

@@ -30,9 +30,9 @@ end
 ffi.gc(prnn.handle, destroy)
 
 prnn.typemap = {
-   ['torch.CudaHalfTensor']   = 'CUDNN_DATA_HALF',
-   ['torch.CudaTensor']       = 'CUDNN_DATA_FLOAT',
-   ['torch.CudaDoubleTensor'] = 'CUDNN_DATA_DOUBLE',
+   ['torch.CudaHalfTensor']   = 'PRNN_DATA_HALF',
+   ['torch.CudaTensor']       = 'PRNN_DATA_FLOAT',
+   ['torch.CudaDoubleTensor'] = 'PRNN_DATA_DOUBLE',
 }
 
 -- TODO: determine if device supports true half and use true half on it
@@ -40,9 +40,9 @@ prnn.typemap = {
 local function determineHalfCapability(dev)
    local prop = cutorch.getDeviceProperties(dev)
    if prop.major >= 6 or prop.name:find'X1' then
-      return 'CUDNN_DATA_HALF'
+      return 'PRNN_DATA_HALF'
    else
-      return 'CUDNN_DATA_FLOAT'
+      return 'PRNN_DATA_FLOAT'
    end
 end
 
@@ -50,8 +50,8 @@ local configmaps = {}
 for i=1,cutorch.getDeviceCount() do
    configmaps[i] = {
       ['torch.CudaHalfTensor']   = determineHalfCapability(i),
-      ['torch.CudaTensor']       = 'CUDNN_DATA_FLOAT',
-      ['torch.CudaDoubleTensor'] = 'CUDNN_DATA_DOUBLE',
+      ['torch.CudaTensor']       = 'PRNN_DATA_FLOAT',
+      ['torch.CudaDoubleTensor'] = 'PRNN_DATA_DOUBLE',
    }
 end
 
@@ -69,7 +69,7 @@ function prnn.getHandle()
         local status = C['prnnCreate'](prnn.handle
                                         + (((device-1) * maxStreamsPerDevice)
                                                 + stream))
-        if status ~= ffi.C.CUDNN_STATUS_SUCCESS then
+        if status ~= ffi.C.PRNN_STATUS_SUCCESS then
             local str = ffi.string(C.prnnGetErrorString(status))
             error('Error in PRNN: ' .. str)
         end
@@ -82,7 +82,7 @@ local errcheck = function(f, ...)
     C.prnnSetStream(prnn.getHandle(),
                      ffi.C.THCState_getCurrentStream(cutorch.getState()))
    local status = C[f](...)
-   if status ~= ffi.C.CUDNN_STATUS_SUCCESS then
+   if status ~= ffi.C.PRNN_STATUS_SUCCESS then
       local str = ffi.string(C.prnnGetErrorString(status))
       error('Error in PRNN: ' .. str .. ' ('..f..')')
    end
@@ -130,9 +130,9 @@ function prnn.getSharedWorkspace()
     return sharedBuffer[device][stream]
 end
 
---[[
 require('prnn.RNN')
 require('prnn.RNNTanh')
+--[[
 require('prnn.RNNReLU')
 require('prnn.BLSTM')
 require('prnn.LSTM')
